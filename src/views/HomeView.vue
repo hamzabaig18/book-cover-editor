@@ -250,7 +250,7 @@
 </template>
 
 <script>
-import apiClient from "@/services/api";
+import instance from "@/services/apiService";
 import FreeTransform from "../components/FreeTransform.vue";
 import html2canvas from "html2canvas";
 
@@ -320,7 +320,7 @@ export default {
     //To fetch books list from api
     async fetchBooks() {
       try {
-        const result = await apiClient.get(
+        const result = await instance.get(
           `/svc/books/v3/lists/overview.json?api-key=${this.apiKey}`
         );
         const data = await result.data.results.lists[1].books;
