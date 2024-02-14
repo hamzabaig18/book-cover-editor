@@ -23,6 +23,12 @@ This project is a simple book cover editor built with Vue 3 and Vite. It allows 
 
 ## Installation
 
+## Node Version
+-  16.16.0 
+
+## NPM Version
+-  8.11.0 
+
 ## Project Setup
 
 ```sh
