@@ -1,6 +1,17 @@
 <template>
-  <div class="h-screen flex items-center justify-center">
-    <div class="w-8/12 flex flex-col items-center">
+  <div class="h-screen flex items-center justify-center overflow-auto">
+    <div class="w-8/12 flex flex-col items-center py-20">
+      <div class="w-full flex items-start">
+        <button
+          type="button"
+          v-if="step != 1"
+          @click="step -= 1"
+          class="bg-transparent flex gap-2 mb-10 text-[18px] px-4 items-center text-black py-1.5 rounded-md outline-none text-center"
+        >
+          <img src="../assets/back_button.png" width="18" />
+          Back
+        </button>
+      </div>
       <!-- Step Indicator -->
       <ul class="flex items-center border-x divide-x mb-20">
         <li
@@ -48,7 +59,7 @@
       </div>
 
       <!-- Step 2: Edit Cover -->
-      <div class="w-4/12" v-if="step === 2">
+      <div class="w-8/12" v-if="step === 2">
         <div class="flex justify-center" v-if="!previewImage">
           <!-- File Upload -->
           <div class="relative">
@@ -69,29 +80,8 @@
             </div>
           </div>
         </div>
-        <div v-else>
-          <!-- Preview Image -->
-          <img
-            :src="previewImage"
-            alt="Preview Image"
-            class="w-full max-h-[350px] object-contain"
-          />
-        </div>
-        <div class="flex justify-center mt-20">
-          <button
-            type="button"
-            @click="step = 3"
-            :disabled="!previewImage"
-            class="bg-sky-500 disabled:bg-gray-400 text-white px-6 py-2 rounded-md border-0 outline-none text-center"
-          >
-            Next
-          </button>
-        </div>
-      </div>
-
-      <!-- Step 3: Preview & Download -->
-      <div class="w-8/12" v-if="step === 3">
-        <div class="flex divide-x min-h-[350px]">
+        <!-- Preview and Edit -->
+        <div class="flex divide-x min-h-[350px]" v-else>
           <div class="w-6/12 space-y-4">
             <!-- Customization Options -->
             <div class="flex items-center gap-3">
@@ -119,6 +109,76 @@
               />
             </div>
           </div>
+          <div class="w-6/12 text-center relative">
+            <!-- Canvas Workspace -->
+            <div class="workspace z-10 relative" ref="workspace">
+              <FreeTransform
+                v-for="element in elements"
+                :key="element.id"
+                :x="element.x"
+                :y="element.y"
+                :scale-x="element.scaleX"
+                :scale-y="element.scaleY"
+                :width="element.width"
+                :height="element.height"
+                :angle="element.angle"
+                :offset-x="offsetX"
+                :offset-y="offsetY"
+                :selected="element.id === selectedElement"
+                :selectOn="element.selectOn"
+                @onSelect="setSelected(element.id)"
+                @update="update(element.id, $event)"
+                :styles="{ zIndex: element.id === selectedElement ? 2 : 1 }"
+                :aspect-ratio="false"
+                :scale-from-center="false"
+              >
+                <h3
+                  @click="changeStyle = element.select"
+                  :style="{
+                    fontSize: `${
+                      element.select === 'title'
+                        ? styles.title.fontSize
+                        : styles.author.fontSize
+                    }px`,
+                    color:
+                      element.select === 'title'
+                        ? styles.title.color
+                        : styles.author.color,
+                    letterSpacing: `${
+                      element.select === 'title'
+                        ? styles.title.spacing
+                        : styles.author.spacing
+                    }px`,
+                  }"
+                  class="cursor-pointer relative z-10"
+                >
+                  {{ element.text }}
+                </h3>
+              </FreeTransform>
+            </div>
+            <!-- Background Image -->
+            <img
+              :src="previewImage"
+              alt="Preview Image"
+              class="max-w-full max-h-[350px] object-contain absolute top-1/2 left-1/2 transform -translate-y-1/2 -translate-x-1/2 z-0"
+            />
+          </div>
+        </div>
+        <div class="flex justify-center mt-20">
+          <button
+            type="button"
+            @click="step = 3"
+            :disabled="!previewImage"
+            class="bg-sky-500 disabled:bg-gray-400 text-white px-6 py-2 rounded-md border-0 outline-none text-center"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 3: Preview & Download -->
+      <div class="w-8/12" v-if="step === 3">
+        <div class="flex divide-x min-h-[350px] justify-center">
           <div class="w-6/12 text-center relative" ref="captureArea">
             <!-- Canvas Workspace -->
             <div class="workspace z-10 relative" ref="workspace">
